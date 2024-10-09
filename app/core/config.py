@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = os.getenv("GOOGLE_CLIENT_SECRET")
     GOOGLE_REDIRECT_URI: str = os.getenv("GOOGLE_REDIRECT_URI")
     EMAIL_LABEL_NAMES: list = ["Cumulative Files", "Miscellaneous Labeled Records", "Miscellaneous Unlabeled Records",  "Records Requests", "Template Response"]
+    SCOPES = ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets']
+    ROSTER_FILE_PATH: str = "ESD.csv"
 
     class Config:
         env_file = ".env"

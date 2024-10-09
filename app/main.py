@@ -20,7 +20,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-csv_path = 'ESD.csv'
+csv_path = settings.ROSTER_FILE_PATH
 root_drive_folder_names = ["Student Records", "Transcripts"]
 
 # def process_cum_files(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
@@ -80,7 +80,7 @@ async def process_all_files():
     creds = authenticate()
     gmail_service = build_gmail_service()
     drive_service = build_drive_service()
-    csv_path = 'ESD.csv'
+    csv_path = settings.ROSTER_FILE_PATH
     
     await process_cum_files(csv_path)
     await process_misc_records(csv_path)
