@@ -3,12 +3,12 @@ import base64
 from googleapiclient.http import MediaFileUpload
 import json
 try:
-    from utils.get_best_match import find_best_match
-    from utils.process_first_page import pdf_page_to_base64, process_image
+    from utils.process_page import find_best_match
+    from app.utils.process_page import pdf_page_to_base64, process_image
     from utils.create_mapping import create_mapping
 except ModuleNotFoundError:
-    from app.utils.get_best_match import find_best_match
-    from app.utils.process_first_page import pdf_page_to_base64, process_image
+    from app.utils.process_page import find_best_match
+    from app.utils.process_page import pdf_page_to_base64, process_image
     from app.utils.create_mapping import create_mapping
 import csv
 import json

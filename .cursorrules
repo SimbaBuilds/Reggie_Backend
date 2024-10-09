@@ -1,0 +1,83 @@
+# Reggie Backend Project - Cursor Rules
+
+You are an expert in Python, FastAPI, Google APIs (Mail, Drive, Auth), Supabase, and OpenAI integrations, specializing in education admin software.
+
+Code Style and Structure:
+- Write clean, efficient Python code following PEP 8 guidelines.
+- Use type hints consistently throughout the codebase.
+- Organize code into logical modules and packages.
+- Implement clear separation of concerns (e.g., API routes, business logic, data access).
+- Use async/await syntax for asynchronous operations, especially with FastAPI and database queries.
+
+Naming Conventions:
+- Use snake_case for function and variable names.
+- Use PascalCase for class names.
+- Prefix private methods and variables with a single underscore.
+
+FastAPI Usage:
+- Utilize FastAPI's dependency injection system for reusable components.
+- Implement proper request validation using Pydantic models.
+- Use appropriate HTTP methods and status codes.
+- Implement comprehensive API documentation using FastAPI's built-in Swagger UI.
+
+Database Interactions (Supabase):
+- Use asynchronous database operations where possible.
+- Implement database migrations for schema changes.
+- Use parameterized queries to prevent SQL injection.
+- Implement efficient querying, avoiding N+1 query problems.
+
+AI and Machine Learning:
+- Implement robust error handling for AI model interactions.
+- Use asynchronous calls for AI processing to prevent blocking operations.
+- Implement caching mechanisms for frequent AI operations to reduce API calls.
+
+File Processing:
+- Implement efficient streaming for large file uploads and downloads.
+- Use appropriate libraries for PDF processing and OCR (e.g., PyPDF2, Tesseract).
+- Implement proper error handling for file operations.
+
+Email Processing:
+- Use asynchronous operations for email interactions.
+- Implement robust parsing for email contents and attachments.
+- Use a queueing system for handling bulk email operations.
+
+Google API Integrations:
+- Implement secure handling of Google API credentials.
+- Use refresh tokens and implement token refresh logic.
+- Optimize API calls to stay within usage limits.
+
+Security:
+- Implement proper authentication and authorization checks.
+- Use environment variables for sensitive information (API keys, database credentials).
+- Implement rate limiting on API endpoints to prevent abuse.
+
+Error Handling and Logging:
+- Implement comprehensive error handling and logging.
+- Use structured logging for better searchability and analysis.
+- Implement proper exception hierarchies for application-specific errors.
+
+Testing:
+- Write unit tests for all critical functions, especially AI and file processing logic.
+- Implement integration tests for API endpoints and database interactions.
+- Use pytest for testing framework.
+
+Performance Optimization:
+- Implement caching where appropriate (e.g., frequently accessed user data).
+- Use background tasks for long-running operations.
+- Optimize database queries and implement indexing strategies.
+
+Scalability:
+- Design with horizontal scalability in mind.
+- Implement stateless architecture where possible.
+
+Documentation:
+- Maintain comprehensive API documentation.
+- Document complex algorithms, especially for AI processing and matching.
+- Include clear comments for non-obvious code sections.
+
+Version Control:
+- Use meaningful commit messages.
+- Implement feature branching workflow.
+- Use pull requests for code reviews.
+
+Follow FastAPI best practices for routing, middleware, and error handling. Prioritize robustness and efficiency in file processing and AI operations.

@@ -2,18 +2,20 @@ from googleapiclient.discovery import build
 try:
     from utils.process_cum_files import get_label_id
     from utils.process_cum_files import process_hundred_messages as func1
-    from utils.process_misc_records import process_hundred_messages as func2
+    from app.utils.handle_misc_records import process_hundred_messages as func2
     from utils.authenticate import authenticate
-    from utils.fetch_unread import fetch_unread_with_label
+    from utils.gmail_utils import fetch_unread_with_label
     from endpoints import gmail_webhook
     from dev.dev_utils import update_pubsub
+    from utils.handle_misc_records import email_label_names
 except ModuleNotFoundError:
     from app.utils.process_cum_files import get_label_id
     from app.utils.process_cum_files import process_hundred_messages as func1
-    from app.utils.process_misc_records import process_hundred_messages as func2
+    from app.utils.handle_misc_records import process_hundred_messages as func2
     from app.utils.authenticate import authenticate
-    from app.utils.fetch_unread import fetch_unread_with_label
+    from app.utils.gmail_utils import fetch_unread_with_label
     from app.endpoints import gmail_webhook
+    from app.utils.handle_misc_records import email_label_names
 from fastapi import FastAPI, BackgroundTasks
 from app.utils.gmail_utils import build_gmail_service, start_watch_for_labels
 import uvicorn
@@ -44,7 +46,6 @@ app.add_middleware(
 
 csv_path = 'ESD.csv'
 root_drive_folder_names = ["Student Records", "Transcripts"]
-email_label_names = ["Miscellaneous Records", "Cumulative Files", "Records Requests"]
 
 def process_cum_files(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
     label_name = email_label_name  

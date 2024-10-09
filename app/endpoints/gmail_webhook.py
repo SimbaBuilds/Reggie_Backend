@@ -3,11 +3,11 @@ from google.auth.transport import requests as google_requests
 import base64
 from google.oauth2 import id_token
 try:
-    from utils.gmail_utils import get_email_body, pass_to_gpt4omini, get_label_id, handle_watched_label, build_gmail_service
-    from utils.get_name_from_registrar import get_name_from_registrar
+    from utils.gmail_utils import get_email_body, pass_to_gpt4omini, get_label_id, handle_watched_label, build_gmail_service, handle_misc_records
+    from utils.handle_misc_records import email_label_names 
 except ModuleNotFoundError:
-    from app.utils.gmail_utils import get_email_body, pass_to_gpt4omini, get_label_id, handle_watched_label, build_gmail_service
-    from app.utils.get_name_from_registrar import get_name_from_registrar
+    from app.utils.gmail_utils import get_email_body, pass_to_gpt4omini, get_label_id, handle_watched_label, build_gmail_service, handle_misc_records
+    from app.utils.handle_misc_records import email_label_names
 
 router = APIRouter()
 
@@ -72,9 +72,9 @@ def handle_watched_label(service, user_id, history_id, label_id):
                     
                     # Process the message based on the label
                     if label_id == get_label_id(service, "Miscellaneous Student Records"):
-                        process_misc_records(service, message)
+                        handle_misc_records(service, message)
                     elif label_id == get_label_id(service, "Student Cumulative Files"):
-                        process_cum_files(service, message)
+                        handle_misc_records(service, message)
 
 
 @router.post("/webhook")

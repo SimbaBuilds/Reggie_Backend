@@ -1,10 +1,9 @@
 import base64
 from email.mime.text import MIMEText
-from process_misc_records import get_label_id
+from app.utils.handle_misc_records import get_label_id
 from authenticate import authenticate
 from googleapiclient.discovery import build
-
-
+from typing import Any, Dict
 
 def create_message(sender, to, subject, message_text):
     message = MIMEText(message_text)
@@ -115,3 +114,23 @@ def build_gmail_service():
 def start_watch_for_labels(service, label_names):
     for label_name in label_names:
         start_watch(service, label_name)
+
+def fetch_unread_with_label(label_id: str, gmail_service: Any, page_token: str) -> Dict[str, Any]:
+    """
+    Fetch unread messages with a specific label from Gmail.
+
+    Args:
+        label_id (str): The ID of the label to filter messages.
+        gmail_service (Any): The Gmail service object.
+        page_token (str): The page token for pagination.
+
+    Returns:
+        Dict[str, Any]: The response from the Gmail API containing the list of messages.
+    """
+    response = gmail_service.users().messages().list(
+        userId='me', 
+        labelIds=[label_id, 'UNREAD'],
+        pageToken=page_token
+    ).execute()
+
+    return response

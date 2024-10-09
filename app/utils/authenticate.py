@@ -6,7 +6,7 @@ from google.auth.transport.requests import Request
 
 
 # SCOPES define the APIs your app can access
-SCOPES = ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/drive']
+SCOPES = ['https://www.googleapis.com/auth/gmail.modify', 'https://www.googleapis.com/auth/gmail.compose', 'https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/spreadsheets']
 
 
 # Function to handle OAuth authentication

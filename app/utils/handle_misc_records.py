@@ -3,17 +3,20 @@ import base64
 from googleapiclient.http import MediaFileUpload
 import json
 try:
-    from utils.get_best_match import find_best_match
+    from utils.process_page import find_best_match
     from utils.create_mapping import create_mapping
     from utils.get_name_from_registrar import get_name_from_registrar
 except ModuleNotFoundError:
-    from app.utils.get_best_match import find_best_match
+    from app.utils.process_page import find_best_match
     from app.utils.create_mapping import create_mapping
     from app.utils.get_name_from_registrar import get_name_from_registrar
 import csv
 import json
 import shutil
 from googleapiclient.errors import HttpError
+
+
+email_label_names = ["Miscellaneous Records", "Cumulative Files", "Records Requests"]
 
 
 # Function to get the gmail label ID by name
