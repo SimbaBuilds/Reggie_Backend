@@ -19,6 +19,7 @@ The back end of the application will do the following:
     b. Miscellaneous Labeled Records -- this email label will handle incoming records in bulk like state test scores, but these records must be labeled with a cover page with first, last, and DOB
     c. Miscellaneous Unlabeled Records -- this email label will handle incoming miscellaneous student records -- it will only be able to handle one record at a time, and the suer will be prompted with an email from reggie asking for the person first, last, and DOB
     d. Records Request -- an email in this label will trigger an auto draft response email containing student records and current transcript
+    e. Template Response -- an email in this trigger will trigger a response using a user template -- templates and descritpions can be uploaded by the user in the app
 
 4. Users will need to update the person roster via email to Reggie or via the application user interface.
 5. Reggie will be able to able to receive email messages containing csv files or google sheet links from users and perform requested edits and additions 
