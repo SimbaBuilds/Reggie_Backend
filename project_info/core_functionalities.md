@@ -1,4 +1,3 @@
-
 #Core Functionalities
 The back end of the application will do the following:
 1. Digitize a school's pdf records.  The set up process for digitization will include the following:

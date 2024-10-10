@@ -1,6 +1,6 @@
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import auth, digitization, roster, email_templates, files, stats, cover_pages, assistant, settings
+from app.api.endpoints import gmail_webhook, digitization, file_management, email_automation, roster_management
 from app.core.config import settings
 from app.services.gmail_service import process_cum_files, process_misc_records
 from app.utils.authenticate import authenticate
@@ -65,15 +65,11 @@ root_drive_folder_names = ["Student Records", "Transcripts"]
 
 
 # Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(digitization.router, prefix="/api/digitize", tags=["Digitization"])
-app.include_router(roster.router, prefix="/api/roster", tags=["Roster Management"])
-app.include_router(email_templates.router, prefix="/api/email-templates", tags=["Email Templates"])
-app.include_router(files.router, prefix="/api/files", tags=["File Management"])
-app.include_router(stats.router, prefix="/api/stats", tags=["Dashboard Statistics"])
-app.include_router(cover_pages.router, prefix="/api/cover-pages", tags=["Cover Pages"])
-app.include_router(assistant.router, prefix="/api/assistant", tags=["Reggie Assistant"])
-app.include_router(settings.router, prefix="/api/settings", tags=["Settings"])
+app.include_router(gmail_webhook.router, prefix="/api/webhook", tags=["webhook"])
+app.include_router(digitization.router, prefix="/api/digitization", tags=["digitization"])
+app.include_router(file_management.router, prefix="/api/file-management", tags=["file-management"])
+app.include_router(email_automation.router, prefix="/api/email-automation", tags=["email-automation"])
+app.include_router(roster_management.router, prefix="/api/roster-management", tags=["roster-management"])
 
 @app.post("/process-files")
 async def process_files(background_tasks: BackgroundTasks):
@@ -104,5 +100,5 @@ update_pubsub("digitize-all-records", "DigitizeRecords", ngrok_url)
 
 if __name__ == "__main__":
     import uvicorn
-    port = int(os.getenv("PORT", 8080))
+    port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=8000)
