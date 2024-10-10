@@ -1,8 +1,3 @@
-#Project Overview
-I am building a web applicaiton called Reggie that is a software product that will speed up workflows in the education admin space.
-This is the back end of the applicaiton built in Python and FastAPI.
-
-If there is specific API documentation you need to complete a task, please ask for it instead of guessing.
 
 #Core Functionalities
 The back end of the application will do the following:
@@ -24,34 +19,3 @@ The back end of the application will do the following:
 4. Users will need to update the person roster via email to Reggie or via the application user interface.
 5. Reggie will be able to able to receive email messages containing csv files or google sheet links from users and perform requested edits and additions 
     a. Prospective users will get 10 emails with Reggie before being prompted to sign up for a plan 
-
-
-
-#Current File Structure
-
-REGGIE_BACKEND
-├── __pycache__
-├── app
-│   ├── __pycache__
-│   ├── endpoints
-│   │   ├── __pycache__
-│   │   ├── __init__.py
-│   │   └── gmail_webhook.py
-│   ├── utils
-│   ├── __init__.py
-│   ├── authenticate.py
-│   ├── create_mapping.py
-│   ├── get_name_from_reg.py
-│   ├── gmail_utils.py
-│   ├── handle_misc_record.py
-│   ├── process_cum_files.py
-│   ├── process_page.py
-│   ├── thread_store.py
-│   ├── __init__.py
-│   ├── main.py
-│   └── schemas.py
-├── node_modules
-├── venv
-├── .cursorules
-├── .env
-└── .env.local

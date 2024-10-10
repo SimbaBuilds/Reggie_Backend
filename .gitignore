@@ -7,3 +7,4 @@ dev_utils.py
 dev/
 credentials.json
 student_mapping.json
+core/config.py  

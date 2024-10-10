@@ -7,6 +7,8 @@ from app.utils.authenticate import authenticate
 from app.services.drive_service import build_drive_service
 from app.services.gmail_service import build_gmail_service
 from app.core.config import settings
+from app.models import User
+from app.utils.authenticate import get_current_user
 
 router = APIRouter()
 
@@ -39,3 +41,23 @@ async def upload_transcript_batch(background_tasks: BackgroundTasks, file: Uploa
     background_tasks.add_task(process_transcript_batch, creds, gmail_service, drive_service, file_path)
     
     return {"message": "Transcript batch upload started"}
+
+@router.post("/start")
+async def start_digitization(current_user: User = Depends(get_current_user)):
+    # Implement digitization start logic
+    pass
+
+@router.get("/status")
+async def get_digitization_status(current_user: User = Depends(get_current_user)):
+    # Implement digitization status check
+    pass
+
+@router.post("/upload/student-csv")
+async def upload_student_csv(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    # Implement student CSV upload logic
+    pass
+
+@router.post("/upload/staff-csv")
+async def upload_staff_csv(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    # Implement staff CSV upload logic
+    pass
