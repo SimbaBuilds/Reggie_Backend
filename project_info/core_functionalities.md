@@ -8,13 +8,14 @@ The back end of the application will do the following:
 
     3. A matching algorithm is used to determine if there is a sufficient match.  If there is a sufficient match, the record will be further processed, if not, details of the record will be sent back to the front end to be displayed to the user.
 
-    5. Option to upload all student records for Reggie to organize
-        1. File name would have to have first last and date of birth
-        2. 4o mini to parse 
+    5. If a users records are already digitized, option to manually organize (with Drive folder structure created for them) so that Reggie can use.
+
+
 
 2. Organize and upload digitized records to the cloud -- folders are found or created.  Parent folder name "Student Records" for students and "Staff Records" for staff.
     1. Use datetime to map current grade level to cohort
     2. Drive folder creation process can be standalone and done before scanning
+    3. Small org versus large org logic to ensure user in correct payment plan (from roster count)
 
 3. A transcript batch of all student's transcripts will come from the frontend and transcripts will automatically be added to students' drive folders
     1. Use gpt-4o-mini to process first n characters and find name and DOB and output with OpenAI API structured output
@@ -35,4 +36,5 @@ The back end of the application will do the following:
     1. Prospective users will get 10 emails with Reggie before being prompted to sign up for a plan 
     2. Will need to incorporate code interpreter as well as internal AI review checks that the user defined tasks have been completed correctly
     3. Reggie will get link to sheet from hyperlink or full link in email 
+    4. If user asks question outside of Reggie's scope, he will still try to be helpful
 
