@@ -1,16 +1,14 @@
 import os
 import sys
 
-print("Current working directory:", os.getcwd())
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print("Project root:", project_root)
 sys.path.insert(0, project_root)
 print("Updated sys.path:", sys.path)
 
-from fastapi import FastAPI, BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.endpoints import gmail_webhook, digitization, email_automation, auth, assistant, cover_pages, email_templates, files, roster, stats, user_settings
+from app.endpoints import digitization, email_automation, auth, assistant, cover_pages, email_templates, files, gmail_webhook, roster, stats, user_settings
 from app.core.config import settings
 from app.utils.authenticate import authenticate
 from app.services.drive_service import build_drive_service
@@ -18,8 +16,8 @@ from app.services.gmail_service import build_gmail_service
 from contextlib import asynccontextmanager
 from dev.start_ngrok import start_ngrok
 import uvicorn
-
-
+import base64
+from dev.update_pubsub import update_pubsub
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -62,6 +60,9 @@ app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 
 
 if __name__ == "__main__":
-    start_ngrok()
+    update_pubsub(settings.NGROK_URL, settings.PUBSUB_PROJECT_ID, settings.PUBSUB_SUBSCRIPTION)
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="127.0.0.1", port=port)
+
+
+# ngrok http 8000 (update pubsub endpoint URL as well)

@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     SUPABASE_ANON_KEY: str = Field(..., env="SUPABASE_ANON_KEY")
     OPENAI_API_KEY: str = Field(..., env="OPENAI_API_KEY")
     PUBSUB_TOPIC: str = Field(..., env="PUBSUB_TOPIC")
+    PUBSUB_PROJECT_ID: str = Field(..., env="PUBSUB_PROJECT_ID")
     PUBSUB_SUBSCRIPTION: str = Field(..., env="PUBSUB_SUBSCRIPTION")
     NGROK_URL: str = Field(..., env="NGROK_URL")
     NGROK_AUTH_TOKEN: str = Field(..., env="NGROK_AUTH_TOKEN")
