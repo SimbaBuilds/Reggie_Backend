@@ -2,14 +2,11 @@ import os
 import base64
 from googleapiclient.http import MediaFileUpload
 import json
-try:
-    from utils.process_page import find_best_match
-    from app.utils.process_page import pdf_page_to_base64, process_image
-    from utils.create_mapping import create_mapping
-except ModuleNotFoundError:
-    from app.utils.process_page import find_best_match
-    from app.utils.process_page import pdf_page_to_base64, process_image
-    from app.utils.create_mapping import create_mapping
+from app.utils.process_page import find_best_match
+from app.utils.process_page import pdf_page_to_base64, process_image
+from app.utils.create_mapping import create_mapping
+from app.utils.gmail_utils import fetch_unread_with_label
+
 import csv
 import json
 import shutil
@@ -261,3 +258,21 @@ def process_hundred_messages(creds, gmail_service, drive_service, email_label_na
     write_list_to_json(no_match_list)
 
 
+def process_cum_files(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
+    label_name = email_label_name  
+    label_id = get_label_id(gmail_service, label_name)
+    page_token = None
+    while True:
+        # Fetch unread messages with pagination
+        response = fetch_unread_with_label(label_id, gmail_service, page_token)
+        messages = response.get('messages', [])
+
+        if not messages:
+            break  # Exit the loop if no more messages are found
+        
+        process_hundred_messages(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path)
+        page_token = response.get('nextPageToken', None)
+        
+        if not page_token:
+            break  
+    print("All cum files processed")

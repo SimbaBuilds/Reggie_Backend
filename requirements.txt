@@ -4,34 +4,50 @@
 #
 #    pip-compile
 #
+aiohappyeyeballs==2.4.3
+    # via aiohttp
+aiohttp==3.10.10
+    # via realtime
+aiosignal==1.3.1
+    # via aiohttp
 annotated-types==0.7.0
     # via pydantic
 anyio==4.6.0
-    # via starlette
+    # via
+    #   httpx
+    #   openai
+    #   starlette
+attrs==24.2.0
+    # via aiohttp
 cachetools==5.5.0
     # via google-auth
 certifi==2024.8.30
-    # via requests
+    # via
+    #   httpcore
+    #   httpx
+    #   requests
 charset-normalizer==3.3.2
     # via requests
-ci-info==0.3.0
-    # via etelemetry
 click==8.1.7
+    # via uvicorn
+deprecated==1.2.14
     # via
-    #   nipype
-    #   uvicorn
-configobj==5.0.9
-    # via fitz
-configparser==7.1.0
-    # via fitz
-etelemetry==0.3.1
-    # via nipype
+    #   opentelemetry-api
+    #   opentelemetry-semantic-conventions
+deprecation==2.1.0
+    # via postgrest
+distro==1.9.0
+    # via openai
 fastapi==0.115.0
     # via -r requirements.in
-filelock==3.16.1
-    # via nipype
-google-api-core==2.20.0
-    # via google-api-python-client
+frozenlist==1.4.1
+    # via
+    #   aiohttp
+    #   aiosignal
+google-api-core[grpc]==2.20.0
+    # via
+    #   google-api-python-client
+    #   google-cloud-pubsub
 google-api-python-client==2.147.0
     # via -r requirements.in
 google-auth==2.35.0
@@ -40,77 +56,119 @@ google-auth==2.35.0
     #   google-api-python-client
     #   google-auth-httplib2
     #   google-auth-oauthlib
+    #   google-cloud-pubsub
 google-auth-httplib2==0.2.0
     # via google-api-python-client
 google-auth-oauthlib==1.2.1
     # via -r requirements.in
-googleapis-common-protos==1.65.0
-    # via google-api-core
+google-cloud-pubsub==2.26.0
+    # via -r requirements.in
+googleapis-common-protos[grpc]==1.65.0
+    # via
+    #   google-api-core
+    #   grpc-google-iam-v1
+    #   grpcio-status
+gotrue==2.9.2
+    # via supabase
+grpc-google-iam-v1==0.13.1
+    # via google-cloud-pubsub
+grpcio==1.66.2
+    # via
+    #   google-api-core
+    #   google-cloud-pubsub
+    #   googleapis-common-protos
+    #   grpc-google-iam-v1
+    #   grpcio-status
+grpcio-status==1.66.2
+    # via
+    #   google-api-core
+    #   google-cloud-pubsub
 h11==0.14.0
-    # via uvicorn
+    # via
+    #   httpcore
+    #   uvicorn
+h2==4.1.0
+    # via httpx
+hpack==4.0.0
+    # via h2
+httpcore==1.0.6
+    # via httpx
 httplib2==0.22.0
     # via
-    #   fitz
     #   google-api-python-client
     #   google-auth-httplib2
+httpx[http2]==0.27.2
+    # via
+    #   gotrue
+    #   openai
+    #   postgrest
+    #   storage3
+    #   supabase
+    #   supafunc
+hyperframe==6.0.1
+    # via h2
 idna==3.10
     # via
     #   anyio
+    #   httpx
     #   requests
-isodate==0.6.1
-    # via rdflib
-looseversion==1.3.0
-    # via nipype
-lxml==5.3.0
+    #   yarl
+importlib-metadata==8.4.0
+    # via opentelemetry-api
+iniconfig==2.0.0
+    # via pytest
+jiter==0.6.1
+    # via openai
+multidict==6.1.0
     # via
-    #   prov
-    #   pyxnat
-networkx
-    # via
-    #   nipype
-    #   prov
-nibabel==5.2.1
-    # via
-    #   fitz
-    #   nipype
-nipype==1.8.6
-    # via fitz
-numpy
-    # via
-    #   fitz
-    #   nibabel
-    #   nipype
-    #   pandas
-    #   scipy
+    #   aiohttp
+    #   yarl
+numpy==2.1.2
+    # via pandas
 oauthlib==3.2.2
     # via requests-oauthlib
+openai==1.41.0
+    # via -r requirements.in
+opentelemetry-api==1.27.0
+    # via
+    #   google-cloud-pubsub
+    #   opentelemetry-sdk
+    #   opentelemetry-semantic-conventions
+opentelemetry-sdk==1.27.0
+    # via google-cloud-pubsub
+opentelemetry-semantic-conventions==0.48b0
+    # via opentelemetry-sdk
 packaging==24.1
     # via
-    #   etelemetry
-    #   nibabel
-    #   nipype
+    #   deprecation
+    #   pytest
 pandas==2.2.3
-    # via
-    #   -r requirements.in
-    #   fitz
-pathlib==1.0.1
-    # via pyxnat
+    # via -r requirements.in
 pdf2image==1.17.0
     # via -r requirements.in
 pillow==10.4.0
     # via
     #   -r requirements.in
     #   pdf2image
+pluggy==1.5.0
+    # via pytest
+postgrest==0.17.1
+    # via supabase
+propcache==0.2.0
+    # via yarl
 proto-plus==1.24.0
-    # via google-api-core
+    # via
+    #   google-api-core
+    #   google-cloud-pubsub
 protobuf==5.28.2
     # via
     #   -r requirements.in
     #   google-api-core
+    #   google-cloud-pubsub
     #   googleapis-common-protos
+    #   grpc-google-iam-v1
+    #   grpcio-status
     #   proto-plus
-prov==2.0.1
-    # via nipype
 pyasn1==0.6.1
     # via
     #   pyasn1-modules
@@ -121,64 +179,73 @@ pydantic==2.9.2
     # via
     #   -r requirements.in
     #   fastapi
+    #   gotrue
+    #   openai
+    #   postgrest
+    #   pydantic-settings
 pydantic-core==2.23.4
     # via pydantic
-pydot==3.0.2
-    # via nipype
+pydantic-settings==2.5.2
+    # via -r requirements.in
 pymupdf==1.24.10
     # via -r requirements.in
 pymupdfb==1.24.10
     # via pymupdf
 pyparsing==3.1.4
-    # via
-    #   httplib2
-    #   pydot
-    #   rdflib
+    # via httplib2
+pytest==8.3.3
+    # via -r requirements.in
 python-dateutil==2.9.0.post0
     # via
-    #   nipype
     #   pandas
-    #   prov
+    #   realtime
+    #   storage3
+python-dotenv==1.0.1
+    # via pydantic-settings
+python-multipart==0.0.12
+    # via -r requirements.in
 pytz==2024.2
     # via pandas
-pyxnat==1.6.2
-    # via fitz
-rdflib==6.3.2
-    # via
-    #   nipype
-    #   prov
+realtime==2.0.5
+    # via supabase
 requests==2.32.3
     # via
     #   -r requirements.in
-    #   etelemetry
     #   google-api-core
-    #   pyxnat
     #   requests-oauthlib
 requests-oauthlib==2.0.0
     # via google-auth-oauthlib
 rsa==4.9
     # via google-auth
-scipy
-    # via
-    #   fitz
-    #   nipype
-simplejson==3.19.3
-    # via nipype
 six==1.16.0
-    # via
-    #   isodate
-    #   python-dateutil
+    # via python-dateutil
 sniffio==1.3.1
-    # via anyio
+    # via
+    #   anyio
+    #   httpx
+    #   openai
 starlette==0.38.6
     # via fastapi
-traits==6.3.2
-    # via nipype
+storage3==0.8.1
+    # via supabase
+strenum==0.4.15
+    # via postgrest
+supabase==2.9.0
+    # via -r requirements.in
+supafunc==0.6.1
+    # via supabase
+tqdm==4.66.5
+    # via openai
 typing-extensions==4.12.2
     # via
     #   fastapi
+    #   openai
+    #   opentelemetry-sdk
     #   pydantic
     #   pydantic-core
+    #   realtime
+    #   storage3
+    #   supabase
 tzdata==2024.2
     # via pandas
 uritemplate==4.1.1
@@ -187,5 +254,11 @@ urllib3==2.2.3
     # via requests
 uvicorn==0.31.0
     # via -r requirements.in
-SQLAlchemy-2.0.35
-psycopg2-binary-2.9.9
+websockets==13.1
+    # via realtime
+wrapt==1.16.0
+    # via deprecated
+yarl==1.14.0
+    # via aiohttp
+zipp==3.20.2
+    # via importlib-metadata

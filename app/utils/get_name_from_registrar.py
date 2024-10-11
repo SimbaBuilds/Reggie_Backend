@@ -1,20 +1,7 @@
 
 import requests
 import re
-from email.mime.text import MIMEText
-import base64
-from fastapi import FastAPI, Request, HTTPException
-from google.auth.transport import requests as google_requests
-from google.oauth2 import id_token
-from googleapiclient.discovery import build
-from pydantic import BaseModel
-from email.mime.text import MIMEText
-try:    
-    from utils.gmail_utils import get_user_response, send_reply, start_watch
-    from utils.thread_store import store_thread_info
-except ModuleNotFoundError:
-    from app.utils.gmail_utils import get_user_response, send_reply, start_watch
-    from app.utils.thread_store import store_thread_info
+from app.utils.thread_store import store_thread_info
 import os
 
 api_key = os.getenv('OPENAI_API_KEY')
@@ -88,13 +75,11 @@ def get_name_from_registrar(pdf_path, creds, gmail_service, message, label_name)
     reply_message = "To whom does this record belong? Please respond in the format last, first, DOB."
 
     # Send reply within the same thread
-    send_reply(gmail_service, "me", message, reply_message, pdf_path)
 
     # Store thread_id and history_id for later use (e.g., in a database or in-memory store)
     store_thread_info(thread_id, history_id)
 
     # Initiate watch on the specified label
-    start_watch(gmail_service, label_name)
     
     # Since we're handling the reply asynchronously via the webhook, we don't wait here
     return  # Processing will continue in the webhook when the user's reply is received

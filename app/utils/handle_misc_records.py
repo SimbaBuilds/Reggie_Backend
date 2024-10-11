@@ -2,21 +2,15 @@ import os
 import base64
 from googleapiclient.http import MediaFileUpload
 import json
-try:
-    from utils.process_page import find_best_match
-    from utils.create_mapping import create_mapping
-    from utils.get_name_from_registrar import get_name_from_registrar
-except ModuleNotFoundError:
-    from app.utils.process_page import find_best_match
-    from app.utils.create_mapping import create_mapping
-    from app.utils.get_name_from_registrar import get_name_from_registrar
+from app.utils.process_page import find_best_match
+from app.utils.create_mapping import create_mapping
+from app.utils.get_name_from_registrar import get_name_from_registrar
 import csv
 import json
 import shutil
 from googleapiclient.errors import HttpError
 
 
-email_label_names = ["Miscellaneous Records", "Cumulative Files", "Records Requests"]
 
 
 # Function to get the gmail label ID by name
@@ -256,3 +250,33 @@ def process_hundred_messages(creds, gmail_service, drive_service, email_label_na
     write_list_to_json(no_match_list)
 
 
+
+
+
+def process_misc_records(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
+    label_name = email_label_name  
+    label_id = get_label_id(gmail_service, label_name)
+    page_token = None
+    while True:
+        # Fetch unread messages with pagination
+        response = fetch_unread_with_label(label_id, gmail_service, page_token)
+        messages = response.get('messages', [])
+
+        if not messages:
+            break  # Exit the loop if no more messages are found
+        
+        process_hundred_messages(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path)
+        page_token = response.get('nextPageToken', None)
+        
+        if not page_token:
+            break  
+    print("All misc records processed")
+
+# Add the fetch_unread_with_label function here to avoid circular import
+def fetch_unread_with_label(label_id, gmail_service, page_token):
+    response = gmail_service.users().messages().list(
+        userId='me', 
+        labelIds=[label_id, 'UNREAD'],
+        pageToken=page_token
+    ).execute()
+    return response

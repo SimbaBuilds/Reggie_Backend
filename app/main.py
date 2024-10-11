@@ -1,15 +1,38 @@
+import os
+import sys
+
+print("Current working directory:", os.getcwd())
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print("Project root:", project_root)
+sys.path.insert(0, project_root)
+print("Updated sys.path:", sys.path)
+
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.endpoints import gmail_webhook, digitization, file_management, email_automation, roster_management
+
+from app.endpoints import gmail_webhook, digitization, email_automation, auth, assistant, cover_pages, email_templates, files, roster, stats, user_settings
 from app.core.config import settings
-from app.services.gmail_service import process_cum_files, process_misc_records
 from app.utils.authenticate import authenticate
 from app.services.drive_service import build_drive_service
 from app.services.gmail_service import build_gmail_service
-from dev.dev_utils import update_pubsub
-import os
+from contextlib import asynccontextmanager
+from dev.start_ngrok import start_ngrok
+import uvicorn
 
-app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize services, database connections, etc.
+    yield
+    # Clean up resources, close connections, etc.
+
+
+app = FastAPI(
+    title= settings.PROJECT_NAME,
+    version= settings.PROJECT_VERSION,
+    lifespan=lifespan
+)
 
 # Set up CORS
 app.add_middleware(
@@ -20,85 +43,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-csv_path = settings.ROSTER_FILE_PATH
-root_drive_folder_names = ["Student Records", "Transcripts"]
-
-# def process_cum_files(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
-#     label_name = email_label_name  
-#     label_id = get_label_id(gmail_service, label_name)
-#     page_token = None
-#     while True:
-#         # Fetch unread messages with pagination
-#         response = fetch_unread_with_label(label_id, gmail_service, page_token)
-#         messages = response.get('messages', [])
-
-#         if not messages:
-#             break  # Exit the loop if no more messages are found
-        
-#         func1(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path)
-#         page_token = response.get('nextPageToken', None)
-        
-#         if not page_token:
-#             break  
-#     print("All cum files processed")
-
-
-
-# def process_misc_records(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path):
-#     label_name = email_label_name  
-#     label_id = get_label_id(gmail_service, label_name)
-#     page_token = None
-#     while True:
-#         # Fetch unread messages with pagination
-#         response = fetch_unread_with_label(label_id, gmail_service, page_token)
-#         messages = response.get('messages', [])
-
-#         if not messages:
-#             break  # Exit the loop if no more messages are found
-        
-#         func2(creds, gmail_service, drive_service, email_label_name, root_drive_folder_name, csv_path)
-#         page_token = response.get('nextPageToken', None)
-        
-#         if not page_token:
-#             break  
-#     print("All misc records processed")
 
 
 # Include routers
 app.include_router(gmail_webhook.router, prefix="/api/webhook", tags=["webhook"])
 app.include_router(digitization.router, prefix="/api/digitization", tags=["digitization"])
-app.include_router(file_management.router, prefix="/api/file-management", tags=["file-management"])
 app.include_router(email_automation.router, prefix="/api/email-automation", tags=["email-automation"])
-app.include_router(roster_management.router, prefix="/api/roster-management", tags=["roster-management"])
+app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
+app.include_router(user_settings.router, prefix="/api/settings", tags=["settings"])
+app.include_router(assistant.router, prefix="/api/assistant", tags=["assistant"])
+app.include_router(cover_pages.router, prefix="/api/cover-pages", tags=["cover-pages"])
+app.include_router(email_templates.router, prefix="/api/email-templates", tags=["email-templates"])
+app.include_router(files.router, prefix="/api/files", tags=["files"])
+app.include_router(roster.router, prefix="/api/roster", tags=["roster"])
+app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
 
-@app.post("/process-files")
-async def process_files(background_tasks: BackgroundTasks):
-    background_tasks.add_task(process_all_files)
-    return {"status": "File processing started"}
 
-async def process_all_files():
-    creds = authenticate()
-    gmail_service = build_gmail_service()
-    drive_service = build_drive_service()
-    csv_path = settings.ROSTER_FILE_PATH
-    
-    await process_cum_files(csv_path)
-    await process_misc_records(csv_path)
 
-@app.on_event("startup")
-async def startup_event():
-    # Initialize services, database connections, etc.
-    pass
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    # Clean up resources, close connections, etc.
-    pass
-
-ngrok_url = os.getenv("NGROK_URL")
-update_pubsub("digitize-all-records", "DigitizeRecords", ngrok_url)
 
 if __name__ == "__main__":
-    import uvicorn
+    start_ngrok()
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=port)

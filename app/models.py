@@ -41,25 +41,41 @@ class Organization(Base):
     gsuite_domain = Column(String(255))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
-class Person(Base):
-    __tablename__ = 'person'
+    students = relationship("Student", back_populates="organization")
+    staff = relationship("Staff", back_populates="organization")
+
+class Student(Base):
+    __tablename__ = 'student'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    organization_id = Column(Integer, ForeignKey('organization.id'))
+    organization_id = Column(Integer, ForeignKey('organization.id'), nullable=False)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
     date_of_birth = Column(Date, nullable=False)
-    person_type = Column(String(50), CheckConstraint("person_type IN ('student', 'staff')"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    organization = relationship("Organization")
+    organization = relationship("Organization", back_populates="students")
+
+class Staff(Base):
+    __tablename__ = 'staff'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    organization_id = Column(Integer, ForeignKey('organization.id'), nullable=False)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
+    date_of_birth = Column(Date, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    organization = relationship("Organization", back_populates="staff")
 
 class RecordProcessing(Base):
     __tablename__ = 'record_processing'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    person_id = Column(Integer, ForeignKey('person.id'))
+    student_id = Column(Integer, ForeignKey('student.id'))
+    staff_id = Column(Integer, ForeignKey('staff.id'))
     original_filename = Column(String(255), nullable=False)
     status = Column(String(50), CheckConstraint("status IN ('pending', 'processing', 'uploaded', 'failed')"))
     error_message = Column(String)
@@ -67,7 +83,8 @@ class RecordProcessing(Base):
     processed_at = Column(DateTime(timezone=True))
     cloud_upload_path = Column(String(512))
 
-    person = relationship("Person")
+    student = relationship("Student")
+    staff = relationship("Staff")
 
 class DigitizationJob(Base):
     __tablename__ = 'digitization_job'
@@ -138,4 +155,16 @@ class UserUsage(Base):
 
     __table_args__ = (
         CheckConstraint('user_id IS NOT NULL AND date IS NOT NULL', name='user_usage_user_id_date_check'),
+    )
+
+
+# Define the ThreadInfo model
+class EmailThreadInfo(Base):
+    __tablename__ = 'email_thread_info'
+
+    thread_id = Column(String, primary_key=True)
+    history_id = Column(String)
+
+    __table_args__ = (
+        UniqueConstraint('thread_id', name='unique_thread_id'),
     )

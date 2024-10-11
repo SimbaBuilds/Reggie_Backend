@@ -1,8 +1,10 @@
 import base64
 from email.mime.text import MIMEText
 from app.utils.handle_misc_records import get_label_id
-from authenticate import authenticate
+from app.utils.authenticate import authenticate
 from googleapiclient.discovery import build
+from app.services.gmail_service import build_gmail_service
+from app.core.config import settings
 from typing import Any, Dict
 
 def create_message(sender, to, subject, message_text):
@@ -33,7 +35,7 @@ def start_watch(service, label_name):
 
     request_body = {
         'labelIds': [label_id],
-        'topicName': 'projects/digitize-all-records/topics/gmail-notifications'
+        'topicName': settings.PUBSUB_TOPIC
     }
 
     try:
@@ -106,10 +108,6 @@ def send_reply(service, user_id, original_message, reply_text, pdf_path=None):
 
     return service.users().messages().send(userId=user_id, body=body).execute()
 
-
-def build_gmail_service():
-    creds = authenticate()
-    return build('gmail', 'v1', credentials=creds)
 
 def start_watch_for_labels(service, label_names):
     for label_name in label_names:

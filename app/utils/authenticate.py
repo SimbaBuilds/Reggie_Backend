@@ -22,3 +22,6 @@ def authenticate():
     print("authentication completed")
     return creds
 
+def get_current_user():
+    pass
+    return None

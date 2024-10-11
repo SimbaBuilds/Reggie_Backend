@@ -1,8 +1,9 @@
 #Core Functionalities
 The back end of the application will do the following:
 1. Digitize a school's pdf records.  The set up process for digitization will include the following:
-    1. A person list csv will come from the front end -- a small AI model will be used to map to correct headers to decrease need for user header naming precision
-    2. Identify person associated with record and further process their record.  
+    1. A student list csv and optional staff list csv will come from the front end -- a small AI model will be used to map to correct headers to decrease need for user header naming precision
+    2. A specific Google Drive folder structure will be created for the user inside their google drive based on the student csv and optional staff csv they uploaded 
+    3. Identify person associated with record and further process their record.  
         1. If the user selects a "consistent first page" option, a user generated natural language description will be used to help an AI enabled vision model tag the person.
         2. If the "cover page" option is used, simple OCR will be used to tag the person.
 
@@ -11,10 +12,8 @@ The back end of the application will do the following:
     5. If a users records are already digitized, option to manually organize (with Drive folder structure created for them) so that Reggie can use.
 
 
-
 2. Organize and upload digitized records to the cloud -- folders are found or created.  Parent folder name "Student Records" for students and "Staff Records" for staff.
     1. Use datetime to map current grade level to cohort
-    2. Drive folder creation process can be standalone and done before scanning
     3. Small org versus large org logic to ensure user in correct payment plan (from roster count)
 
 3. A transcript batch of all student's transcripts will come from the frontend and transcripts will automatically be added to students' drive folders

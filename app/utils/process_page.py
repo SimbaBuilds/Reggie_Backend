@@ -16,7 +16,6 @@ if not api_key:
 
 
 
-
 def pdf_page_to_base64(pdf_path):
     pages = convert_from_path(pdf_path, first_page=0, last_page=1)
     image_path = "page_image.jpg"
