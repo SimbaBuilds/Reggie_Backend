@@ -8,3 +8,6 @@ dev/
 credentials.json
 student_mapping.json
 core/config.py  
+ESD.csv
+google_credentials.json
+requirements_backup.txt
