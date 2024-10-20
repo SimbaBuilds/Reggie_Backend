@@ -1,170 +1,150 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Date, ForeignKey, CheckConstraint, JSON, UniqueConstraint
-from sqlalchemy.orm import declarative_base, relationship
-from sqlalchemy.dialects.postgresql import INET, JSONB
-from sqlalchemy.sql import func
+from pydantic import BaseModel, Field, EmailStr, constr, conint, Json
+from datetime import datetime, date
+from typing import Optional, List
+from enum import Enum
+from typing import Literal
 
 
-Base = declarative_base()
+class SubscriptionType(str, Enum):
+    free = "free"
+    digitize_only = "digitize_only"
+    full = "full"
 
-class ThreadInfo(Base):
-    __tablename__ = 'thread_info'
+class OrganizationType(str, Enum):
+    school = "school"
+    district = "district"
+    other = "other"
 
-    thread_id = Column(String, primary_key=True)
-    history_id = Column(String)
+class OrganizationSize(str, Enum):
+    small = "small"
+    large = "large"
 
-    __table_args__ = (
-        UniqueConstraint('thread_id', name='unique_thread_id'),
-    )
+class ProcessingStatus(str, Enum):
+    pending = "pending"
+    processing = "processing"
+    uploaded = "uploaded"
+    failed = "failed"
 
+class JobStatus(str, Enum):
+    pending = "pending"
+    in_progress = "in_progress"
+    completed = "completed"
+    failed = "failed"
 
-class User(Base):
-    __tablename__ = 'user'
+#table name is "user"
+class User(BaseModel):
+    id: Optional[int] = None
+    email: EmailStr
+    hashed_password: str
+    first_name: str
+    last_name: str
+    organization_id: int
+    organization_name: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    last_login: Optional[datetime] = None
+    email_alias: Optional[EmailStr] = None
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    email = Column(String(255), nullable=False, unique=True)
-    hashed_password = Column(String(255), nullable=False)
-    first_name = Column(String(100), nullable=False)
-    last_name = Column(String(100), nullable=False)
-    organization_name = Column(String(255), nullable=False)
-    is_gsuite_user = Column(Boolean, nullable=False, default=False)
-    subscription_type = Column(String(50), CheckConstraint("subscription_type IN ('free', 'digitize_only', 'full')"))
-    digitization_complete = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_login = Column(DateTime(timezone=True))
-    email_alias = Column(String(255), unique=True)
+#table name is "organization"
+class Organization(BaseModel):
+    id: int
+    name: str
+    type: OrganizationType
+    size: OrganizationSize
+    rosters_uploaded: bool = False
+    records_digitized: bool = False
+    records_organized: bool = False
+    transcripts_uploaded: bool = False
+    email_labels_created: bool = False
+    email_template_created: bool = False
+    subscription_type: SubscriptionType
+    created_by: int
+    created_at: datetime = Field(default_factory=datetime.now)
 
-class Organization(Base):
-    __tablename__ = 'organization'
+#table name is "student"
+class Student(BaseModel):
+    id: Optional[int] = None
+    organization_id: int
+    first_name: str
+    last_name: str
+    date_of_birth: date
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(255), nullable=False)
-    gsuite_domain = Column(String(255))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+#table name is "staff"
+class Staff(BaseModel):
+    id: Optional[int] = None
+    organization_id: int
+    first_name: str
+    last_name: str
+    date_of_birth: date
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
-    students = relationship("Student", back_populates="organization")
-    staff = relationship("Staff", back_populates="organization")
+#table name is "record_processing"
+class RecordProcessing(BaseModel):
+    id: Optional[int] = None
+    student_id: Optional[int] = None
+    staff_id: Optional[int] = None
+    original_filename: str
+    status: ProcessingStatus
+    error_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
+    processed_at: Optional[datetime] = None
+    cloud_upload_path: Optional[str] = None
 
-class Student(Base):
-    __tablename__ = 'student'
+#table name is "digitization_job"
+class DigitizationJob(BaseModel):
+    id: Optional[int] = None
+    user_id: int
+    status: JobStatus
+    created_at: datetime = Field(default_factory=datetime.now)
+    completed_at: Optional[datetime] = None
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    organization_id = Column(Integer, ForeignKey('organization.id'), nullable=False)
-    first_name = Column(String(100), nullable=False)
-    last_name = Column(String(100), nullable=False)
-    date_of_birth = Column(Date, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+#table name is "email_automation"
+class EmailAutomation(BaseModel):
+    id: Optional[int] = None
+    user_id: int
+    label: str
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.now)
+    last_triggered: Optional[datetime] = None
+    total_emails_processed: int = 0
 
-    organization = relationship("Organization", back_populates="students")
+#table name is "email_template"
+class EmailTemplate(BaseModel):
+    id: Optional[int] = None
+    user_id: int
+    name: str
+    description: Optional[str] = None
+    content: str
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
 
-class Staff(Base):
-    __tablename__ = 'staff'
+#table name is "audit_log"
+class AuditLog(BaseModel):
+    id: Optional[int] = None
+    user_id: int
+    action: str
+    entity_type: Optional[str] = None
+    entity_id: Optional[str] = None
+    details: Optional[Json] = None
+    ip_address: Optional[str] = None
+    user_agent: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.now)
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    organization_id = Column(Integer, ForeignKey('organization.id'), nullable=False)
-    first_name = Column(String(100), nullable=False)
-    last_name = Column(String(100), nullable=False)
-    date_of_birth = Column(Date, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+#table name is "user_usage"
+class UserUsage(BaseModel):
+    id: Optional[int] = None
+    user_id: int
+    date: date
+    emails_sent_to_reggie: int = 0
+    cumulative_files_processed: int = 0
+    miscellaneous_labeled_processed: int = 0
+    miscellaneous_unlabeled_processed: int = 0
+    records_requests_processed: int = 0
+    template_responses_processed: int = 0
 
-    organization = relationship("Organization", back_populates="staff")
-
-class RecordProcessing(Base):
-    __tablename__ = 'record_processing'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    student_id = Column(Integer, ForeignKey('student.id'))
-    staff_id = Column(Integer, ForeignKey('staff.id'))
-    original_filename = Column(String(255), nullable=False)
-    status = Column(String(50), CheckConstraint("status IN ('pending', 'processing', 'uploaded', 'failed')"))
-    error_message = Column(String)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    processed_at = Column(DateTime(timezone=True))
-    cloud_upload_path = Column(String(512))
-
-    student = relationship("Student")
-    staff = relationship("Staff")
-
-class DigitizationJob(Base):
-    __tablename__ = 'digitization_job'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    status = Column(String(50), CheckConstraint("status IN ('pending', 'in_progress', 'completed', 'failed')"))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    completed_at = Column(DateTime(timezone=True))
-
-    user = relationship("User")
-
-class EmailAutomation(Base):
-    __tablename__ = 'email_automation'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    label = Column(String(100), nullable=False)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    last_triggered = Column(DateTime(timezone=True))
-    total_emails_processed = Column(Integer, default=0)
-
-    user = relationship("User")
-
-class EmailTemplate(Base):
-    __tablename__ = 'email_template'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    name = Column(String(255), nullable=False)
-    description = Column(String)
-    content = Column(String, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    user = relationship("User")
-
-class AuditLog(Base):
-    __tablename__ = 'audit_log'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    action = Column(String(255), nullable=False)
-    entity_type = Column(String(50))
-    entity_id = Column(String(255))
-    details = Column(JSONB)
-    ip_address = Column(INET)
-    user_agent = Column(String)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-
-    user = relationship("User")
-
-class UserUsage(Base):
-    __tablename__ = 'user_usage'
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    date = Column(Date, nullable=False)
-    emails_sent_to_reggie = Column(Integer, default=0)
-    cumulative_files_processed = Column(Integer, default=0)
-    miscellaneous_labeled_processed = Column(Integer, default=0)
-    miscellaneous_unlabeled_processed = Column(Integer, default=0)
-    records_requests_processed = Column(Integer, default=0)
-    template_responses_processed = Column(Integer, default=0)
-
-    user = relationship("User")
-
-    __table_args__ = (
-        CheckConstraint('user_id IS NOT NULL AND date IS NOT NULL', name='user_usage_user_id_date_check'),
-    )
-
-
-# Define the ThreadInfo model
-class EmailThreadInfo(Base):
-    __tablename__ = 'email_thread_info'
-
-    thread_id = Column(String, primary_key=True)
-    history_id = Column(String)
-
-    __table_args__ = (
-        UniqueConstraint('thread_id', name='unique_thread_id'),
-    )
+#table name is "email_thread_info"
+class EmailThreadInfo(BaseModel):
+    thread_id: str
+    history_id: Optional[str] = None
