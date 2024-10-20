@@ -65,4 +65,4 @@ if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=port)
 
 
-# ngrok http 8000 (update pubsub endpoint URL as well)
+# ngrok http 8000 --> URL in .env --> auto updates pub/sub endpoint URL

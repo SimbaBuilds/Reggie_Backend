@@ -62,8 +62,8 @@ async def get_digitization_status(current_user: User = Depends(get_current_user)
 
 @router.post("/upload/student-csv", response_model=CSVUploadResponse)
 async def upload_student_csv(
+    user_id: int,
     file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
     supabase = Depends(get_db)
 ):
     try:
@@ -86,6 +86,11 @@ async def upload_student_csv(
         
         # Process the CSV with mapped headers
         processed_df = process_csv(df, mapped_headers, "student")
+        
+        current_user = supabase.table("user").select("*").eq("id", user_id).execute()
+        if not current_user.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        current_user = current_user.data[0] 
         
         # Get the organization for the current user
         organization = supabase.table("organization").select("*").eq("name", current_user.organization_name).execute()
@@ -124,9 +129,9 @@ async def upload_student_csv(
 
 @router.post("/upload/staff-csv", response_model=CSVUploadResponse)
 async def upload_staff_csv(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
-    supabase = Depends(get_db)
+    user_id: int,
+    supabase = Depends(get_db),
+    file: UploadFile = File(...)
 ):
     try:
         contents = await file.read()
@@ -148,6 +153,11 @@ async def upload_staff_csv(
         
         # Process the CSV with mapped headers
         processed_df = process_csv(df, mapped_headers, "staff")
+
+        current_user = supabase.table("user").select("*").eq("id", user_id).execute()
+        if not current_user.data:
+            raise HTTPException(status_code=404, detail="User not found")
+        current_user = current_user.data[0] 
         
         # Get the organization for the current user
         organization = supabase.table("organization").select("*").eq("name", current_user.organization_name).execute()
