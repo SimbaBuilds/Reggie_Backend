@@ -21,7 +21,7 @@ The back end of the application will do the following:
     2. Handle two page transcripts
     3. Logic for including transcripts in records requests - app file storage or store in drive folders and handle duplicates upon semester re-upload
 
-4. A series of email assistant automations will be set up for the customer utilizing watch functions linked to their email that act when an email is assigned a label.  Email labels are as follows:
+4. A series of email assistant automations will be set up for the customer utilizing watch functions linked to their email that act when an email is assigned a label.  Email labels created for them via API?  Email labels are as follows:
     1. Cumulative Files -- this email label will handle the initial digitization process as well as the creation of new persons in the system post digitization -- it is able to handle multiple attachemnts in one email as well as attachments spread across multiple emails within or not wihtin the same thread.
     2. Miscellaneous Labeled Records -- this email label will handle incoming records in bulk like state test scores, but these records must be labeled with a cover page with first, last, and DOB -- auto rename the attachment
     3. Miscellaneous Unlabeled Records -- this email label will handle incoming miscellaneous student records -- it will only be able to handle one record at a time, and the suer will be prompted with an email from reggie asking for the person first, last, and DOB

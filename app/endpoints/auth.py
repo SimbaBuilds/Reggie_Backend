@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.models import User  # This should be your database model
 from app.utils.authenticate import get_current_user
 from app.schemas.auth import LoginResponse, SignupResponse, LogoutResponse, UserResponse, UserCreate
+from app.db.session import get_db
 
 router = APIRouter()
 
