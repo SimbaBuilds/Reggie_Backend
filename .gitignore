@@ -3,7 +3,6 @@ venv/
 token.json
 unmatched.json
 .env
-dev_utils.py
 dev/
 credentials.json
 student_mapping.json

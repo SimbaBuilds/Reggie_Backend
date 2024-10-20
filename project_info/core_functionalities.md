@@ -27,13 +27,20 @@ The back end of the application will do the following:
     3. Miscellaneous Unlabeled Records -- this email label will handle incoming miscellaneous student records -- it will only be able to handle one record at a time, and the suer will be prompted with an email from reggie asking for the person first, last, and DOB
     4. Records Request -- an email in this label will trigger an auto draft response email containing student records and current transcript
     5. Template Response -- an email in this trigger will trigger a response using a user template -- templates and descritpions can be uploaded by the user in the app
+        1. Max 8 template emails
+
 
 5. Users will need to update the person roster via email to Reggie or via the application user interface.
     1. Internal logic to use date of birth to determine whether person should be added to student list or staff list
 
 6. Reggie will be able to able to receive email messages containing csv files or google sheet links from users and perform requested edits and additions 
     1. Prospective users will get 10 emails with Reggie before being prompted to sign up for a plan 
-    2. Will need to incorporate code interpreter as well as internal AI review checks that the user defined tasks have been completed correctly
+    2. Will need to incorporate code interpreter in a sandbox environment as well as internal AI review checks that the user defined tasks have been completed correctly
     3. Reggie will get link to sheet from hyperlink or full link in email 
     4. If user asks question outside of Reggie's scope, he will still try to be helpful
+    5. Reggie can only add to a sheet or create a new sheet - no deletions 
 
+
+7. Other Features
+    1. Max 5 users per organization
+    2. Free tier: file structure built for you and 5 Reggie actions per user per week
