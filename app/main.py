@@ -5,18 +5,12 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, project_root)
 print("Updated sys.path:", sys.path)
 
-from fastapi import FastAPI, BackgroundTasks, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from app.endpoints import digitization, email_automation, auth, assistant, cover_pages, email_templates, files, gmail_webhook, roster, stats, user_settings
 from app.core.config import settings
-from app.utils.google_auth import authenticate
-from app.services.drive_service import build_drive_service
-from app.services.gmail_service import build_gmail_service
 from contextlib import asynccontextmanager
-from dev.start_ngrok import start_ngrok
 import uvicorn
-import base64
 from dev.update_pubsub import update_pubsub
 
 @asynccontextmanager

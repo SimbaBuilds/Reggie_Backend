@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List
 from supabase import create_client, Client
-from app.utils.google_auth import verify_token
+from app.utils.auth import verify_token
 from app.core.config import settings
 from app.models import Organization, OrganizationType, OrganizationSize, User
 

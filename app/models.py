@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr, constr, conint, Json
+from pydantic import BaseModel, Field, Json
 from datetime import datetime, date
 from typing import Optional, List
 from enum import Enum
@@ -34,7 +34,7 @@ class JobStatus(str, Enum):
 #table name is "user"
 class User(BaseModel):
     id: Optional[int] = None
-    email: EmailStr
+    email: str
     hashed_password: str
     first_name: str
     last_name: str
@@ -42,7 +42,7 @@ class User(BaseModel):
     organization_name: str
     created_at: datetime = Field(default_factory=datetime.now)
     last_login: Optional[datetime] = None
-    email_alias: Optional[EmailStr] = None
+    email_alias: Optional[str] = None
 
 #table name is "organization"
 class Organization(BaseModel):

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, BackgroundTasks, UploadFile, File
-from app.utils.google_auth import get_current_user
+from app.utils.auth import get_current_user
 from app.models import User 
 from app.schemas.roster_management import RosterManagementResponse
 

@@ -1,7 +1,6 @@
 import base64
 from email.mime.text import MIMEText
 from app.utils.handle_misc_records import get_label_id
-from app.utils.google_auth import authenticate
 from googleapiclient.discovery import build
 from app.services.gmail_service import build_gmail_service
 from app.core.config import settings

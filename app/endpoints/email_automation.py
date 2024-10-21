@@ -1,5 +1,5 @@
 from fastapi import APIRouter, BackgroundTasks
-from app.utils.google_auth import get_current_user
+from app.utils.auth import get_current_user
 from app.models import User
 from app.schemas.email_automation import EmailAutomationResponse
 

@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.schemas.files import CSVUploadResponse
 from app.schemas.digitization import DigitizationResponse, DigitizationStatus, DigitizationStartRequest, TranscriptBatchUploadResponse
 from app.db.session import get_db
-from app.utils.google_auth import authenticate
+from app.utils.gsuite_utils import google_authenticate
 from app.services.drive_service import build_drive_service
 from app.services.gmail_service import build_gmail_service
 from app.core.config import settings
@@ -11,7 +11,7 @@ from app.models import User
 from app.services.ai_service import map_csv_headers
 from app.utils.csv_processor import process_csv
 from app.utils.validate_csv import validate_csv
-from app.utils.google_auth import get_current_user
+from app.utils.auth import get_current_user
 from app.utils.process_cum_files import process_cum_files
 from app.utils.handle_misc_records import process_misc_records
 from app.utils.process_transcript_batch import process_transcript_batch
@@ -26,7 +26,7 @@ async def digitize_records(background_tasks: BackgroundTasks, file: UploadFile =
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
     
-    creds = authenticate()
+    creds = google_authenticate()
     gmail_service = build_gmail_service()
     drive_service = build_drive_service()
     csv_path = settings.ROSTER_FILE_PATH
@@ -42,7 +42,7 @@ async def upload_transcript_batch(background_tasks: BackgroundTasks, file: Uploa
     with open(file_path, "wb") as buffer:
         buffer.write(await file.read())
     
-    creds = authenticate()
+    creds = google_authenticate()
     gmail_service = build_gmail_service()
     drive_service = build_drive_service()
     
