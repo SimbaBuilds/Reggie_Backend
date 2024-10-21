@@ -5,7 +5,7 @@ import json
 from app.utils.process_page import find_best_match
 from app.utils.process_page import pdf_page_to_base64, process_image
 from app.utils.create_mapping import create_mapping
-from app.utils.gmail_utils import fetch_unread_with_label
+from app.utils.gsuite_utils import fetch_unread_with_label
 
 import csv
 import json

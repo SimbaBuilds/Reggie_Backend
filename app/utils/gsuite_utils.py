@@ -1,11 +1,31 @@
 import base64
 from email.mime.text import MIMEText
 from app.utils.handle_misc_records import get_label_id
-from app.utils.authenticate import authenticate
+from app.utils.google_auth import authenticate
 from googleapiclient.discovery import build
 from app.services.gmail_service import build_gmail_service
 from app.core.config import settings
 from typing import Any, Dict
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+import os
+
+# Function to handle OAuth authentication
+def google_authenticate():
+    creds = None
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file('token.json', settings.SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file('credentials.json', settings.SCOPES)
+            creds = flow.run_local_server(port=0)
+        with open('token.json', 'w') as token:
+            token.write(creds.to_json())
+    print("authentication completed")
+    return creds
 
 def create_message(sender, to, subject, message_text):
     message = MIMEText(message_text)

@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.endpoints import digitization, email_automation, auth, assistant, cover_pages, email_templates, files, gmail_webhook, roster, stats, user_settings
 from app.core.config import settings
-from app.utils.authenticate import authenticate
+from app.utils.google_auth import authenticate
 from app.services.drive_service import build_drive_service
 from app.services.gmail_service import build_gmail_service
 from contextlib import asynccontextmanager

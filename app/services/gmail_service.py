@@ -1,5 +1,5 @@
 from googleapiclient.discovery import build
-from app.utils.authenticate import authenticate
+from app.utils.google_auth import authenticate
 from app.core.config import settings
 
 

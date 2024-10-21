@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.schemas.files import CSVUploadResponse
 from app.schemas.digitization import DigitizationResponse, DigitizationStatus, DigitizationStartRequest, TranscriptBatchUploadResponse
 from app.db.session import get_db
-from app.utils.authenticate import authenticate
+from app.utils.google_auth import authenticate
 from app.services.drive_service import build_drive_service
 from app.services.gmail_service import build_gmail_service
 from app.core.config import settings
@@ -11,7 +11,7 @@ from app.models import User
 from app.services.ai_service import map_csv_headers
 from app.utils.csv_processor import process_csv
 from app.utils.validate_csv import validate_csv
-from app.utils.authenticate import get_current_user
+from app.utils.google_auth import get_current_user
 from app.utils.process_cum_files import process_cum_files
 from app.utils.handle_misc_records import process_misc_records
 from app.utils.process_transcript_batch import process_transcript_batch

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
-from app.utils.gmail_utils import get_label_id
+from app.utils.gsuite_utils import get_label_id
 from app.core.config import settings
 from app.db.session import get_db
 from app.utils.thread_store import is_thread_id_stored, remove_thread_info

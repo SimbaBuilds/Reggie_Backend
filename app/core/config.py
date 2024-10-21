@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     PUBSUB_ACCESS: dict = Field(..., env="PUBSUB_ACCESS")    
     NGROK_URL: str = Field(..., env="NGROK_URL")
     NGROK_AUTH_TOKEN: str = Field(..., env="NGROK_AUTH_TOKEN")
-    JWT_SECRET: str = Field(..., env="JWT_SECRET")  
+    JWT_SECRET: str = Field(..., env="JWT_SECRET")
+    ALGORITHM: str  = Field(..., env="ALGORITHM")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(..., env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
     class Config:
         env_file = ".env"

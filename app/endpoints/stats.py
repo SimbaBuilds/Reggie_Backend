@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from app.utils.authenticate import get_current_user
+from app.utils.google_auth import get_current_user
 from app.models import User       
 from app.schemas.stats import StatsResponse
 
