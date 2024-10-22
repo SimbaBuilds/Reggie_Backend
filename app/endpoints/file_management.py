@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, UploadFile, File
 from app.utils.auth import get_current_user
 from app.models import User 
-from app.schemas.files import FileListResponse, FileUploadResponse, FileDeleteResponse
+from app.schemas.file_management import FileListResponse, FileUploadResponse, FileDeleteResponse
 
 router = APIRouter()
 

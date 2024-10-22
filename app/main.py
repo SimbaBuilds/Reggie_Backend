@@ -7,7 +7,7 @@ print("Updated sys.path:", sys.path)
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.endpoints import digitization, email_automation, auth, assistant, cover_pages, email_templates, files, gmail_webhook, roster, stats, user_settings
+from app.endpoints import digitization, email_automation, auth, assistant, cover_pages, digitization, email_templates, file_management, gmail_webhook, registration, roster, stats, user_settings 
 from app.core.config import settings
 from contextlib import asynccontextmanager
 import uvicorn
@@ -46,9 +46,11 @@ app.include_router(user_settings.router, prefix="/api/settings", tags=["settings
 app.include_router(assistant.router, prefix="/api/assistant", tags=["assistant"])
 app.include_router(cover_pages.router, prefix="/api/cover-pages", tags=["cover-pages"])
 app.include_router(email_templates.router, prefix="/api/email-templates", tags=["email-templates"])
-app.include_router(files.router, prefix="/api/files", tags=["files"])
+app.include_router(file_management.router, prefix="/api/files", tags=["files"])
 app.include_router(roster.router, prefix="/api/roster", tags=["roster"])
 app.include_router(stats.router, prefix="/api/stats", tags=["stats"])
+app.include_router(registration.router, prefix="/api/registration", tags=["registration"])
+
 
 
 

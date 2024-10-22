@@ -1,6 +1,6 @@
 from fastapi import APIRouter, BackgroundTasks, UploadFile, File, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.schemas.files import CSVUploadResponse
+from app.schemas.file_management import CSVUploadResponse
 from app.schemas.digitization import DigitizationResponse, DigitizationStatus, DigitizationStartRequest, TranscriptBatchUploadResponse
 from app.db.session import get_db
 from app.utils.gsuite_utils import google_authenticate

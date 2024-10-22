@@ -5,6 +5,10 @@ from supabase import create_client, Client
 from app.utils.auth import verify_token
 from app.core.config import settings
 from app.models import Organization, OrganizationType, OrganizationSize, User
+from app.utils.auth import pwd_context
+from app.schemas.registration import UserCreate, OrganizationCreate, UserResponse, OrganizationResponse, SubscriptionType
+from app.db.session import get_db
+
 
 router = APIRouter()
 
@@ -14,59 +18,90 @@ supabase: Client = create_client(
     supabase_key=settings.SUPABASE_KEY
 )
 
-class OrganizationCreate(BaseModel):
-    name: str
-    type: OrganizationType
-    size: OrganizationSize
 
-@router.post("/api/organization", response_model=Organization)
-async def create_organization(
-    org_details: OrganizationCreate,
-    user_payload: dict = Depends(verify_token)
-):
+@router.post("/signup/user", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup_user(user_data: UserCreate, supabase = Depends(get_db)):
     try:
-        user_id = user_payload.get("user_id")
+        # Check if user already exists
+        existing_user = supabase.table("user").select("*").eq("email", user_data.email).execute()
+        if existing_user.data:
+            raise HTTPException(status_code=400, detail="User with this email already exists")
         
-        # Check if user already has an organization
-        user_data, user_error = supabase.table("users").select("organization_id, organization_name").eq("id", user_id).execute()
-        if user_error:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch user data")
+        # Check if organization exists
+        # Hash the password
+        hashed_password = pwd_context.hash(user_data.password)
         
-        if user_data[1] and user_data[1][0].get("organization_id"):
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User already belongs to an organization")
-
-        # Insert organization details into Supabase
-        org_data, org_error = supabase.table("organization").insert({
-            "name": org_details.name,
-            "type": org_details.type,
-            "size": org_details.size,
-            "created_by": user_id
-        }).execute()
-
-        if org_error:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create organization: {org_error.message}")
-
-        new_org = org_data[1][0]
-        new_org_id = new_org["id"]
-        new_org_name = new_org["name"]
-
-        # Update user's organization_id and organization_name
-        _, update_error = supabase.table("users").update({
-            "organization_id": new_org_id,
-            "organization_name": new_org_name
-        }).eq("id", user_id).execute()
+        # Create new user
+        new_user = {
+            "email": user_data.email,
+            "hashed_password": hashed_password,
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "email_alias": user_data.email_alias or None
+        }
         
-        if update_error:
-            # Rollback organization creation if user update fails
-            supabase.table("organization").delete().eq("id", new_org_id).execute()
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update user's organization")
-
-        return Organization(**new_org)
-
-    except HTTPException as he:
-        raise he
+        result = supabase.table("user").insert(new_user).execute()
+        
+        if not result.data:
+            raise HTTPException(status_code=500, detail="Failed to create user")
+        
+        created_user = result.data[0]
+        
+        return UserResponse(
+            id=created_user['id'],
+            email=created_user['email'],
+            first_name=created_user['first_name'],
+            last_name=created_user['last_name'],
+            email_alias=created_user['email_alias'],
+            message="User created successfully"
+        )
+    except HTTPException as http_exc:
+        raise http_exc
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
+
+@router.post("/signup/organization", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)
+async def signup_organization(org_data: OrganizationCreate, supabase = Depends(get_db)):
+    try:
+        # Check if organization already exists
+        existing_org = supabase.table("organization").select("*").eq("name", org_data.name).execute()
+        if existing_org.data:
+            raise HTTPException(status_code=400, detail="Organization with this name already exists")
+        
+        # Create new organization
+        new_org = {
+            "name": org_data.name,
+            "type": org_data.type,
+            "size": org_data.size,
+            "subscription_type": SubscriptionType.free,  # Default subscription type
+            "created_by": org_data.created_by
+        }
+        
+        result = supabase.table("organization").insert(new_org).execute()
+        
+        if not result.data:
+            raise HTTPException(status_code=500, detail="Failed to create organization")
+        
+        created_org = result.data[0]
+        
+        # Update user with organization_id
+        supabase.table("user").update({"organization_id": created_org['id']}).eq("id", org_data.created_by).execute()
+        
+        return OrganizationResponse(
+            id=created_org['id'],
+            name=created_org['name'],
+            type=created_org['type'],
+            size=created_org['size'],
+            subscription_type=created_org['subscription_type'],
+            created_by=created_org['created_by'],
+            message="Organization created successfully"
+        )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    
 
 @router.get("/api/organizations", response_model=List[Organization])
 async def get_organizations(
