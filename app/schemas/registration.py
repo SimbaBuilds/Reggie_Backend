@@ -61,3 +61,10 @@ class OrganizationResponse(BaseModel):
     subscription_type: SubscriptionType
     created_by: int
     message: str
+
+
+class GoogleUserData(BaseModel):
+    email: str
+    first_name: str
+    last_name: str
+    google_id: str

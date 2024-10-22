@@ -148,3 +148,5 @@ class UserUsage(BaseModel):
 class EmailThreadInfo(BaseModel):
     thread_id: str
     history_id: Optional[str] = None
+
+

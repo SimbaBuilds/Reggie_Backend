@@ -2,11 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List
 from supabase import create_client, Client
-from app.utils.auth import verify_token
+from app.utils.auth import verify_token, create_access_token
 from app.core.config import settings
 from app.models import Organization, OrganizationType, OrganizationSize, User
 from app.utils.auth import pwd_context
-from app.schemas.registration import UserCreate, OrganizationCreate, UserResponse, OrganizationResponse, SubscriptionType
+from app.schemas.registration import UserCreate, OrganizationCreate, UserResponse, OrganizationResponse, SubscriptionType, GoogleUserData
 from app.db.session import get_db
 
 
@@ -103,7 +103,7 @@ async def signup_organization(org_data: OrganizationCreate, supabase = Depends(g
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     
 
-@router.get("/api/organizations", response_model=List[Organization])
+@router.get("/organizations", response_model=List[Organization])
 async def get_organizations(
     name: str = "",
     user_payload: dict = Depends(verify_token)
@@ -128,7 +128,7 @@ async def get_organizations(
 class JoinOrganizationRequest(BaseModel):
     organization_id: int
 
-@router.post("/api/join-organization", response_model=User)
+@router.post("/join-organization", response_model=User)
 async def join_organization(
     join_request: JoinOrganizationRequest,
     user_payload: dict = Depends(verify_token)
@@ -166,3 +166,56 @@ async def join_organization(
         raise he
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {str(e)}")
+
+
+
+@router.post("/signup/google", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
+async def signup_google_user(user_data: GoogleUserData, supabase = Depends(get_db)):
+    try:
+        # Check if user already exists
+        existing_user = supabase.table("user").select("*").eq("email", user_data.email).execute()
+        if existing_user.data:
+            # If user exists, return the existing user data with a different status code
+            user = existing_user.data[0]
+            return UserResponse(
+                id=user['id'],
+                email=user['email'],
+                first_name=user['first_name'],
+                last_name=user['last_name'],
+                email_alias=user.get('email_alias'),
+                message="User already exists",
+                access_token=create_access_token(data={"sub": user['email']})
+            ), status.HTTP_200_OK
+        
+        # Create new user
+        new_user = {
+            "email": user_data.email,
+            "first_name": user_data.first_name,
+            "last_name": user_data.last_name,
+            "google_id": user_data.google_id,
+            "auth_provider": "google"
+        }
+        
+        result = supabase.table("user").insert(new_user).execute()
+        
+        if not result.data:
+            raise HTTPException(status_code=500, detail="Failed to create user")
+        
+        created_user = result.data[0]
+        
+        # Create access token
+        access_token = create_access_token(data={"sub": created_user['email']})
+        
+        return UserResponse(
+            id=created_user['id'],
+            email=created_user['email'],
+            first_name=created_user['first_name'],
+            last_name=created_user['last_name'],
+            email_alias=created_user.get('email_alias'),
+            message="User created successfully",
+            access_token=access_token
+        )
+    except HTTPException as http_exc:
+        raise http_exc
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
