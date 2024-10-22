@@ -58,7 +58,7 @@ app.include_router(registration.router, prefix="/api/registration", tags=["regis
 if __name__ == "__main__":
     update_pubsub(settings.NGROK_URL, settings.PUBSUB_PROJECT_ID, settings.PUBSUB_SUBSCRIPTION)
     port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="127.0.0.1", port=port)
+    uvicorn.run(app, host="localhost", port=port)
 
 
 # ngrok http 8000 --> URL in .env --> auto updates pub/sub endpoint URL
