@@ -42,6 +42,6 @@ The back end of the application will do the following:
 
 
 7. Other Features
-    1. Max 5 users per organization
+    1. Max 10 users per organization
     2. Free tier: file structure built for you and 5 Reggie actions per user per week
-    3. Need more tiers for large districts
+    3. Need tiers for digitzation and reggie assistant
