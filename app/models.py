@@ -35,7 +35,7 @@ class JobStatus(str, Enum):
 class User(BaseModel):
     id: Optional[int] = None
     email: str
-    hashed_password: str
+    hashed_password: Optional[str] = None
     first_name: str
     last_name: str
     organization_id: int
@@ -48,8 +48,10 @@ class User(BaseModel):
 class Organization(BaseModel):
     id: int
     name: str
+    created_at: datetime = Field(default_factory=datetime.now)
     type: OrganizationType
     size: OrganizationSize
+    created_by: int
     rosters_uploaded: bool = False
     records_digitized: bool = False
     records_organized: bool = False
@@ -57,8 +59,6 @@ class Organization(BaseModel):
     email_labels_created: bool = False
     email_template_created: bool = False
     subscription_type: SubscriptionType
-    created_by: int
-    created_at: datetime = Field(default_factory=datetime.now)
 
 #table name is "student"
 class Student(BaseModel):
