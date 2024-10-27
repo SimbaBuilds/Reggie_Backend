@@ -6,10 +6,14 @@ from app.utils.auth import verify_token, create_access_token
 from app.core.config import settings
 from app.models import Organization, OrganizationType, OrganizationSize, User
 from app.utils.auth import pwd_context
-from app.schemas.registration import UserCreate, OrganizationCreate, UserResponse, OrganizationResponse, SubscriptionType, GoogleUserData
+from app.schemas.registration import UserCreate, OrganizationCreate, UserResponse, OrganizationResponse, SubscriptionType, GoogleUserData, ExistingOrganizationResponse
 from app.db.session import get_db
 import secrets
-
+import logging
+from fastapi import Query
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -19,6 +23,7 @@ supabase: Client = create_client(
     supabase_key=settings.SUPABASE_KEY
 )
 
+#region User Signup
 
 @router.post("/signup/user", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup_user(user_data: UserCreate, supabase = Depends(get_db)):
@@ -119,14 +124,21 @@ async def signup_google_user(user_data: GoogleUserData, supabase = Depends(get_d
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+#endregion
 
+#region Organization Details
 
-@router.post("/signup/organization", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)
-async def signup_organization(org_data: OrganizationCreate, supabase = Depends(get_db)):
+@router.post("/create/organization", response_model=OrganizationResponse, status_code=status.HTTP_201_CREATED)
+async def create_organization(org_data: OrganizationCreate, supabase = Depends(get_db)):
     try:
+        logger.info(f"Received organization data: {org_data.dict()}")
+        
         # Check if organization already exists
         existing_org = supabase.table("organization").select("*").eq("name", org_data.name).execute()
+        logger.info(f"Existing organization query result: {existing_org}")
+        
         if existing_org.data:
+            logger.warning(f"Organization with name '{org_data.name}' already exists")
             raise HTTPException(status_code=400, detail="Organization with this name already exists")
         
         # Create new organization
@@ -134,56 +146,69 @@ async def signup_organization(org_data: OrganizationCreate, supabase = Depends(g
             "name": org_data.name,
             "type": org_data.type,
             "size": org_data.size,
-            "subscription_type": SubscriptionType.free,  # Default subscription type
+            "subscription_type": SubscriptionType.free.value,  # Default subscription type
             "created_by": org_data.created_by
         }
+        logger.info(f"New organization data: {new_org}")
         
         result = supabase.table("organization").insert(new_org).execute()
+        logger.info(f"Insert result: {result}")
         
         if not result.data:
+            logger.error("Failed to create organization: No data returned")
             raise HTTPException(status_code=500, detail="Failed to create organization")
         
         created_org = result.data[0]
+        logger.info(f"Created organization: {created_org}")
         
         # Update user with organization_id
-        supabase.table("user").update({"organization_id": created_org['id']}).eq("id", org_data.created_by).execute()
+        user_update_result = supabase.table("user").update({"organization_id": created_org['id']}).eq("id", org_data.created_by).execute()
+        logger.info(f"User update result: {user_update_result}")
         
         return OrganizationResponse(
             id=created_org['id'],
             name=created_org['name'],
             type=created_org['type'],
             size=created_org['size'],
-            subscription_type=created_org['subscription_type'],
+            subscription_type=SubscriptionType(created_org['subscription_type']),
             created_by=created_org['created_by'],
             message="Organization created successfully"
         )
     except HTTPException as http_exc:
+        logger.error(f"HTTP Exception: {http_exc}")
         raise http_exc
     except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
     
 
-@router.get("/organizations", response_model=List[Organization])
-async def get_organizations(
-    name: str = "",
-    user_payload: dict = Depends(verify_token)
+@router.get("/get-organization", response_model=ExistingOrganizationResponse)
+async def get_organization(
+    name: str = Query("", description="Name of the organization to check"),
+    id: int = Query(None, description="ID of the organization to check")
 ):
-    try:
-        # Query organizations from Supabase
-        query = supabase.table("organization").select("*")
-        
-        if name:
-            query = query.ilike("name", f"%{name}%")
-        
-        data, error = query.execute()
+    query = supabase.table("organization").select("*")
+    
+    if name:
+        query = query.ilike("name", f"%{name}%")
+    if id is not None:
+        query = query.eq("id", id)
+    
+    result = query.execute()
 
-        if error:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to fetch organizations: {error.message}")
+    if result.error:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+                            detail=f"Failed to fetch organizations: {result.error.message}")
 
-        return [Organization(**org) for org in data[1]]
+    if not result.data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, 
+                            detail="No organizations found matching the criteria")
 
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {str(e)}")
+    return ExistingOrganizationResponse(
+        id=result.data[0]['id'],
+        name=result.data[0]['name'],
+        message="Organization found successfully"
+    )
 
 class JoinOrganizationRequest(BaseModel):
     organization_id: int
@@ -227,6 +252,7 @@ async def join_organization(
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"An error occurred: {str(e)}")
 
+#endregion
 
 
 
